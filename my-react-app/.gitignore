@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# NIAA Kids API database (created on first run)
+server/data/

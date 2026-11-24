@@ -1,16 +1,36 @@
-# React + Vite
+# NIAA Kids — playful daily wear
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React storefront (Vite) with a small Node/Express API and a built-in SQLite database.
 
-Currently, two official plugins are available:
+## Run it
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev        # API on :3001 + website on :5173 (Vite proxies /api to the API)
+```
 
-## React Compiler
+- `/` — NIAA Kids store (`src/NiaaKids.jsx`, the whole page in one file)
+- `/littlelune` — the earlier LittleLune page (`src/LittleLune.jsx`)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Production: `npm run build && npm start` serves the built site and the API together on port 3001
+(`PORT=8080 npm start` to change it).
 
-## Expanding the ESLint configuration
+## Backend
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| Area       | Endpoints |
+| ---------- | --------- |
+| Catalogue  | `GET /api/categories`, `GET /api/products?featured=1&category=dresses&q=dress`, `GET /api/products/:id` |
+| Cart       | `GET /api/cart`, `POST /api/cart/items {productId, qty}`, `PATCH /api/cart/items/:id {qty}`, `DELETE /api/cart/items/:id` |
+| Wishlist   | `GET /api/wishlist`, `PUT /api/wishlist/:id`, `DELETE /api/wishlist/:id` |
+| Newsletter | `POST /api/newsletter {email}` |
+| Orders     | `POST /api/orders {name, email}` — turns the shopper's cart into an order |
+| Admin      | `GET /api/admin/orders`, `GET /api/admin/subscribers` |
+
+- Shoppers are identified by an anonymous `nk_sid` cookie (no accounts yet).
+- Free shipping from $50, otherwise $5.99 (`server/index.js`).
+- Products and categories live in `server/seed.js`; edit and restart to update the shop.
+- Data is stored in `server/data/niaa.db` (created on first run, ignored by git). Set `DB_PATH` to move it.
+- Admin endpoints are off unless you start the API with `ADMIN_TOKEN=your-secret`, then call them with
+  `Authorization: Bearer your-secret`, e.g.
+  `curl -H "Authorization: Bearer your-secret" http://localhost:3001/api/admin/orders`.
+- No payment provider is connected: "Place Order" records the order but does not take payment.
